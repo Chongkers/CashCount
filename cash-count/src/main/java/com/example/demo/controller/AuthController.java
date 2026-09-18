@@ -14,9 +14,21 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
+    @GetMapping("/")
+    public String root() {
+        return "redirect:/login";
+    }
+
     @GetMapping("/login")
     public String showLoginForm() {
         return "login"; 
+    }
+
+    @PostMapping("/login")
+    public String processLogin(@RequestParam(required = false) String email, 
+                               @RequestParam(required = false) String password) {
+        // Redirect to dashboard controller
+        return "redirect:/dashboard";
     }
 
     @GetMapping("/signup")

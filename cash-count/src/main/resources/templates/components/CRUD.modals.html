@@ -1,0 +1,449 @@
+<!-- CRUD Modals Component: Create, Read, Update, Delete & Set Budget -->
+<div th:fragment="crud-modals" id="crud-modals-wrapper">
+
+    <!-- 0.0 SET MAINTAINING BALANCE MODAL (PROTOTYPE SETUP) -->
+    <div id="setMaintainingBalanceModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-full bg-gray-900/60 backdrop-blur-sm">
+        <div class="relative p-4 w-full max-w-md max-h-full">
+            <div class="relative bg-white rounded-xl shadow-2xl dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                <!-- Modal header -->
+                <div class="flex justify-between items-center p-4 sm:p-5 border-b rounded-t dark:border-gray-700">
+                    <div class="flex items-center space-x-2">
+                        <div class="p-2 bg-emerald-100 text-emerald-600 rounded-lg dark:bg-emerald-900/40 dark:text-emerald-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white" id="balanceModalTitle">Set Maintaining Balance</h3>
+                            <span id="balanceModalSubtitle" class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Prototype Setup</span>
+                        </div>
+                    </div>
+                    <button type="button" onclick="closeModal('setMaintainingBalanceModal')" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-700 dark:hover:text-white">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </button>
+                </div>
+                <!-- Modal body -->
+                <form id="setBalanceForm" action="/balance/set" method="POST" onsubmit="handleBalanceSubmit(event)" class="p-4 sm:p-5">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                        Set your base maintaining cash reserve for this prototype. This amount serves as your protected threshold; transactions causing the balance to drop below ₱0.00 will be strictly blocked.
+                    </p>
+                    <div class="grid gap-4 mb-4">
+                        <!-- Balance Amount (₱) -->
+                        <div>
+                            <label for="baseBalanceInput" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Base Maintaining Balance (₱) <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400 font-bold">₱</span>
+                                <input type="number" name="balance" id="baseBalanceInput" step="0.01" min="0" required placeholder="7500.00" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block w-full pl-8 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            </div>
+                            <div class="flex items-center gap-1.5 mt-2">
+                                <span class="text-[11px] text-gray-400">Presets:</span>
+                                <button type="button" onclick="setBalancePreset(5000)" class="px-2 py-0.5 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800 transition">₱5k</button>
+                                <button type="button" onclick="setBalancePreset(7500)" class="px-2 py-0.5 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800 transition">₱7.5k</button>
+                                <button type="button" onclick="setBalancePreset(10000)" class="px-2 py-0.5 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800 transition">₱10k</button>
+                                <button type="button" onclick="setBalancePreset(20000)" class="px-2 py-0.5 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800 transition">₱20k</button>
+                            </div>
+                        </div>
+
+                        <!-- Account / Reserve Label -->
+                        <div>
+                            <label for="reserveNameInput" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Reserve Name / Label</label>
+                            <input type="text" name="reserveName" id="reserveNameInput" placeholder="Maintaining cash reserve" value="Maintaining cash reserve" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end space-x-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                        <button type="button" onclick="closeModal('setMaintainingBalanceModal')" class="py-2 px-4 text-sm font-medium text-gray-700 bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-600 transition">
+                            Cancel
+                        </button>
+                        <button type="submit" class="text-white inline-flex items-center bg-emerald-600 hover:bg-emerald-700 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-2 text-center dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:focus:ring-emerald-800 transition">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Save Maintaining Balance
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 0.1 SET / EDIT BUDGET MODAL -->
+    <div id="setBudgetModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-full bg-gray-900/60 backdrop-blur-sm">
+        <div class="relative p-4 w-full max-w-md max-h-full">
+            <div class="relative bg-white rounded-xl shadow-2xl dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                <!-- Modal header -->
+                <div class="flex justify-between items-center p-4 sm:p-5 border-b rounded-t dark:border-gray-700">
+                    <div class="flex items-center space-x-2">
+                        <div class="p-2 bg-blue-100 text-blue-600 rounded-lg dark:bg-blue-900/40 dark:text-blue-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white" id="budgetModalTitle">Set Monthly Budget</h3>
+                    </div>
+                    <button type="button" onclick="closeModal('setBudgetModal')" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-700 dark:hover:text-white">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </button>
+                </div>
+                <!-- Modal body -->
+                <form id="setBudgetForm" action="/budget/set" method="POST" onsubmit="handleBudgetSubmit(event)" class="p-4 sm:p-5">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                        Define your target monthly spending threshold. The progress bar will responsively track your total expenses against this limit.
+                    </p>
+                    <div class="grid gap-4 mb-4">
+                        <!-- Month & Year -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label for="budgetMonthInput" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Budget Month <span class="text-red-500">*</span></label>
+                                <select name="month" id="budgetMonthInput" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                    <option value="January">January</option>
+                                    <option value="February">February</option>
+                                    <option value="March">March</option>
+                                    <option value="April">April</option>
+                                    <option value="May">May</option>
+                                    <option value="June">June</option>
+                                    <option value="July">July</option>
+                                    <option value="August">August</option>
+                                    <option value="September" selected>September</option>
+                                    <option value="October">October</option>
+                                    <option value="November">November</option>
+                                    <option value="December">December</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="budgetYearInput" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Year <span class="text-red-500">*</span></label>
+                                <input type="number" name="year" id="budgetYearInput" min="2020" max="2035" value="2026" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            </div>
+                        </div>
+
+                        <!-- Budget Limit (₱) -->
+                        <div>
+                            <label for="budgetLimitInput" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Monthly Limit Amount (₱) <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400 font-bold">₱</span>
+                                <input type="number" name="limit" id="budgetLimitInput" step="0.01" min="1" required placeholder="5000.00" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-8 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end space-x-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                        <button type="button" onclick="closeModal('setBudgetModal')" class="py-2 px-4 text-sm font-medium text-gray-700 bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-600 transition">
+                            Cancel
+                        </button>
+                        <button type="submit" class="text-white inline-flex items-center bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition">
+                            Save Budget
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. CREATE / ADD TRANSACTION MODAL -->
+    <div id="createTransactionModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-full bg-gray-900/60 backdrop-blur-sm">
+        <div class="relative p-4 w-full max-w-xl max-h-full">
+            <div class="relative bg-white rounded-xl shadow-2xl dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                <!-- Modal header -->
+                <div class="flex justify-between items-center p-4 sm:p-5 border-b rounded-t dark:border-gray-700">
+                    <div class="flex items-center space-x-2">
+                        <div class="p-2 bg-blue-100 text-blue-600 rounded-lg dark:bg-blue-900/40 dark:text-blue-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Add New Transaction</h3>
+                    </div>
+                    <button type="button" onclick="closeModal('createTransactionModal')" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-700 dark:hover:text-white">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </button>
+                </div>
+                <!-- Modal body -->
+                <form id="createTransactionForm" action="/transactions/add" method="POST" onsubmit="handleCreateSubmit(event)" class="p-4 sm:p-5">
+                    
+                    <!-- Maintaining Balance Warning Banner -->
+                    <div id="createBalanceWarning" class="hidden mb-4 p-3 text-xs text-amber-800 rounded-lg bg-amber-50 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                        Notice: Expenses cannot exceed your current maintaining balance.
+                    </div>
+
+                    <div class="grid gap-4 mb-4 sm:grid-cols-2">
+                        <!-- Transaction Type -->
+                        <div class="sm:col-span-2">
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Transaction Type <span class="text-red-500">*</span></label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="flex items-center justify-center p-3 text-sm font-medium border rounded-lg cursor-pointer transition border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <input type="radio" name="createType" value="EXPENSE" checked class="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 focus:ring-red-500 mr-2">
+                                    <span class="text-red-600 dark:text-red-400 font-semibold flex items-center">
+                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+                                        Expense (Cash Out)
+                                    </span>
+                                </label>
+                                <label class="flex items-center justify-center p-3 text-sm font-medium border rounded-lg cursor-pointer transition border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <input type="radio" name="createType" value="INCOME" class="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 focus:ring-emerald-500 mr-2">
+                                    <span class="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center">
+                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                        Income (Cash In)
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Description / Title -->
+                        <div class="sm:col-span-2">
+                            <label for="createTitle" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Transaction Description <span class="text-red-500">*</span></label>
+                            <input type="text" name="title" id="createTitle" required placeholder="e.g., Grocery Shopping, Meralco Bill, Salary" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+                        </div>
+
+                        <!-- Category -->
+                        <div>
+                            <label for="createCategory" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category <span class="text-red-500">*</span></label>
+                            <select name="category" id="createCategory" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <option value="Food & Dining">Food & Dining</option>
+                                <option value="Utilities">Utilities</option>
+                                <option value="Transportation">Transportation</option>
+                                <option value="Housing">Housing</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Salary">Salary</option>
+                                <option value="Freelance">Freelance</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <!-- Amount -->
+                        <div>
+                            <label for="createAmount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Amount (₱) <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400 font-bold">₱</span>
+                                <input type="number" name="amount" id="createAmount" step="0.01" min="0.01" required placeholder="0.00" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-8 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+                            </div>
+                        </div>
+
+                        <!-- Date -->
+                        <div class="sm:col-span-2">
+                            <label for="createDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date <span class="text-red-500">*</span></label>
+                            <input type="date" name="date" id="createDate" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="sm:col-span-2">
+                            <label for="createNotes" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Notes / Remarks (Optional)</label>
+                            <textarea name="notes" id="createNotes" rows="2" placeholder="Add any details or receipts information..." class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-end space-x-3 pt-2 border-t border-gray-200 dark:border-gray-700">
+                        <button type="button" onclick="closeModal('createTransactionModal')" class="py-2 px-4 text-sm font-medium text-gray-700 bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-600 transition">
+                            Cancel
+                        </button>
+                        <button type="submit" class="text-white inline-flex items-center bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition">
+                            <svg class="mr-1.5 -ml-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                            Save Transaction
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. UPDATE / EDIT TRANSACTION MODAL -->
+    <div id="updateTransactionModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-full bg-gray-900/60 backdrop-blur-sm">
+        <div class="relative p-4 w-full max-w-xl max-h-full">
+            <div class="relative bg-white rounded-xl shadow-2xl dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                <!-- Modal header -->
+                <div class="flex justify-between items-center p-4 sm:p-5 border-b rounded-t dark:border-gray-700">
+                    <div class="flex items-center space-x-2">
+                        <div class="p-2 bg-amber-100 text-amber-600 rounded-lg dark:bg-amber-900/40 dark:text-amber-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Update Transaction</h3>
+                    </div>
+                    <button type="button" onclick="closeModal('updateTransactionModal')" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-700 dark:hover:text-white">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </button>
+                </div>
+                <!-- Modal body -->
+                <form id="updateTransactionForm" action="/transactions/update" method="POST" onsubmit="handleUpdateSubmit(event)" class="p-4 sm:p-5">
+                    <input type="hidden" name="id" id="editTransactionId">
+                    
+                    <div class="grid gap-4 mb-4 sm:grid-cols-2">
+                        <!-- Transaction Type -->
+                        <div class="sm:col-span-2">
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Transaction Type <span class="text-red-500">*</span></label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="flex items-center justify-center p-3 text-sm font-medium border rounded-lg cursor-pointer transition border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <input type="radio" name="type" id="editTypeExpense" value="EXPENSE" class="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 focus:ring-red-500 mr-2">
+                                    <span class="text-red-600 dark:text-red-400 font-semibold flex items-center">
+                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+                                        Expense
+                                    </span>
+                                </label>
+                                <label class="flex items-center justify-center p-3 text-sm font-medium border rounded-lg cursor-pointer transition border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <input type="radio" name="type" id="editTypeIncome" value="INCOME" class="w-4 h-4 text-emerald-600 bg-gray-100 border-gray-300 focus:ring-emerald-500 mr-2">
+                                    <span class="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center">
+                                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                        Income
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Title -->
+                        <div class="sm:col-span-2">
+                            <label for="editTitle" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Transaction Description <span class="text-red-500">*</span></label>
+                            <input type="text" name="title" id="editTitle" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        </div>
+
+                        <!-- Category -->
+                        <div>
+                            <label for="editCategory" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category <span class="text-red-500">*</span></label>
+                            <select name="category" id="editCategory" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <option value="Food & Dining">Food & Dining</option>
+                                <option value="Utilities">Utilities</option>
+                                <option value="Transportation">Transportation</option>
+                                <option value="Housing">Housing</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Salary">Salary</option>
+                                <option value="Freelance">Freelance</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <!-- Amount -->
+                        <div>
+                            <label for="editAmount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Amount (₱) <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 dark:text-gray-400 font-bold">₱</span>
+                                <input type="number" name="amount" id="editAmount" step="0.01" min="0.01" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-8 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            </div>
+                        </div>
+
+                        <!-- Date -->
+                        <div class="sm:col-span-2">
+                            <label for="editDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date <span class="text-red-500">*</span></label>
+                            <input type="date" name="date" id="editDate" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="sm:col-span-2">
+                            <label for="editNotes" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Notes / Remarks</label>
+                            <textarea name="notes" id="editNotes" rows="2" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
+                        <button type="button" onclick="triggerDeleteFromEdit()" class="text-red-600 inline-flex items-center hover:text-white border border-red-600 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 transition">
+                            <svg class="mr-1 -ml-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                            Delete
+                        </button>
+                        <div class="flex items-center space-x-2">
+                            <button type="button" onclick="closeModal('updateTransactionModal')" class="py-2 px-4 text-sm font-medium text-gray-700 bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-600 transition">
+                                Cancel
+                            </button>
+                            <button type="submit" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition">
+                                Update Transaction
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. READ / VIEW TRANSACTION MODAL -->
+    <div id="readTransactionModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-full bg-gray-900/60 backdrop-blur-sm">
+        <div class="relative p-4 w-full max-w-lg max-h-full">
+            <div class="relative p-5 bg-white rounded-xl shadow-2xl dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                <!-- Header -->
+                <div class="flex justify-between items-start pb-4 mb-4 border-b border-gray-200 dark:border-gray-700">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span id="previewTypeBadge" class="text-xs font-semibold px-2.5 py-0.5 rounded">Expense</span>
+                            <span id="previewCategoryBadge" class="text-xs font-medium px-2.5 py-0.5 rounded">Category</span>
+                        </div>
+                        <h3 id="previewTitle" class="mt-2 text-xl font-bold text-gray-900 dark:text-white">Transaction Title</h3>
+                    </div>
+                    <button type="button" onclick="closeModal('readTransactionModal')" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex dark:hover:bg-gray-700 dark:hover:text-white">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                    </button>
+                </div>
+                
+                <!-- Details Body -->
+                <div class="space-y-4 mb-6">
+                    <div class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-100 dark:border-gray-600">
+                        <div class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold mb-1">Total Amount</div>
+                        <div id="previewAmount" class="text-3xl font-extrabold text-gray-900 dark:text-white">₱ 0.00</div>
+                    </div>
+
+                    <dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+                        <div>
+                            <dt class="font-medium text-gray-500 dark:text-gray-400">Date Recorded</dt>
+                            <dd id="previewDate" class="font-semibold text-gray-900 dark:text-white mt-0.5">Sep 17, 2026</dd>
+                        </div>
+                        <div>
+                            <dt class="font-medium text-gray-500 dark:text-gray-400">Transaction ID</dt>
+                            <dd id="previewId" class="font-mono text-xs text-gray-600 dark:text-gray-300 mt-1">#TXN-000</dd>
+                        </div>
+                        <div class="col-span-2">
+                            <dt class="font-medium text-gray-500 dark:text-gray-400">Notes & Remarks</dt>
+                            <dd id="previewNotes" class="mt-1 text-gray-700 dark:text-gray-300 italic bg-gray-50 dark:bg-gray-700/30 p-3 rounded border border-gray-200 dark:border-gray-700 min-h-[48px]">No notes provided.</dd>
+                        </div>
+                    </dl>
+                </div>
+
+                <!-- Footer Actions -->
+                <div class="flex justify-between items-center pt-3 border-t border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center space-x-2">
+                        <button type="button" id="previewEditBtn" class="text-white inline-flex items-center bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 transition">
+                            <svg class="mr-1.5 -ml-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" clip-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" /></svg>
+                            Edit
+                        </button>
+                        <button type="button" id="previewDeleteBtn" class="text-red-600 inline-flex items-center hover:text-white border border-red-600 hover:bg-red-600 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2 text-center dark:border-red-500 dark:text-red-500 dark:hover:text-white dark:hover:bg-red-600 transition">
+                            Delete
+                        </button>
+                    </div>
+                    <button type="button" onclick="closeModal('readTransactionModal')" class="py-2 px-4 text-sm font-medium text-gray-700 bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-600 transition">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. DELETE CONFIRMATION MODAL -->
+    <div id="deleteTransactionModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-full bg-gray-900/60 backdrop-blur-sm">
+        <div class="relative p-4 w-full max-w-md max-h-full">
+            <div class="relative p-6 text-center bg-white rounded-xl shadow-2xl dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+                <button type="button" onclick="closeModal('deleteTransactionModal')" class="text-gray-400 absolute top-3 right-3 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-700 dark:hover:text-white">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                </button>
+                
+                <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </div>
+                
+                <h3 class="mb-2 text-lg font-bold text-gray-900 dark:text-white">Delete Transaction</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    Are you sure you want to delete <strong id="deleteTargetTitle" class="text-gray-900 dark:text-white">this item</strong> (<span id="deleteTargetAmount" class="font-semibold text-red-500">₱0.00</span>)? This action cannot be undone.
+                </p>
+                
+                <form id="deleteTransactionForm" action="/transactions/delete" method="POST" onsubmit="confirmDelete(event)">
+                    <input type="hidden" name="id" id="deleteTargetId">
+                    <div class="flex justify-center items-center space-x-3">
+                        <button type="button" onclick="closeModal('deleteTransactionModal')" class="py-2.5 px-4 text-sm font-medium text-gray-700 bg-white rounded-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-600 transition">
+                            No, Cancel
+                        </button>
+                        <button type="submit" class="py-2.5 px-4 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900 transition">
+                            Yes, Delete It
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toastNotification" class="fixed bottom-5 right-5 z-50 flex items-center w-full max-w-xs p-4 space-x-3 text-gray-500 bg-white rounded-lg shadow-2xl dark:text-gray-400 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 transition-all duration-300 transform translate-y-16 opacity-0 pointer-events-none" role="alert">
+        <div id="toastIconContainer" class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-lg bg-blue-100 text-blue-500 dark:bg-blue-800 dark:text-blue-200">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+        </div>
+        <div id="toastMessage" class="text-sm font-medium text-gray-900 dark:text-white">Notification</div>
+    </div>
+
+</div>
