@@ -14,7 +14,9 @@ public class Transaction {
     private Double amount;
     private String category;
     private LocalDate date;
+    private String notes;
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -41,6 +43,14 @@ public class Transaction {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getTitle() {
+        return description;
+    }
+
+    public void setTitle(String title) {
+        this.description = title;
     }
 
     public Double getAmount() {
@@ -75,5 +85,11 @@ public class Transaction {
         this.user = user;
     }
 
-    // Add Getters and Setters here
+    public String getNotes() {
+        return notes != null ? notes : "";
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
 }
