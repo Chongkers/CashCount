@@ -36,14 +36,7 @@ erDiagram
         LocalDate date
         Long user_id FK
     }
-
-
-
-
-
-
-
-
+```
 
 
 # 📘 CashCount System — Prototype Documentation Guide
