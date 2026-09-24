@@ -1,18 +1,18 @@
 <!-- Hero Component: Maintaining Balance & Monthly Budget -->
 <section th:fragment="hero" class="px-4 sm:px-8 py-6 sm:py-8 antialiased">
     <div
-        class="mx-auto grid max-w-screen-xl rounded-2xl bg-gray-50 p-6 dark:bg-gray-800 md:p-8 lg:grid-cols-12 lg:gap-8 lg:p-10 xl:gap-12 border border-gray-200 dark:border-gray-700 shadow-xl">
+        class="mx-auto grid max-w-screen-xl rounded-2xl bg-white/95 p-6 dark:bg-[#0d241a] md:p-8 lg:grid-cols-12 lg:gap-8 lg:p-10 xl:gap-12 border border-[#b2e0d4]/80 dark:border-[#163829] shadow-xl shadow-[#007a33]/5 transition-colors duration-200">
 
         <!-- LEFT: Total Maintaining Balance -->
         <div
-            class="lg:col-span-5 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-700 pb-6 lg:pb-0 lg:pr-8">
+            class="lg:col-span-5 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-[#163829] pb-6 lg:pb-0 lg:pr-8">
             <div class="flex items-center justify-between mb-1">
                 <div class="flex items-center space-x-2">
-                    <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Total
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-[#004d00]/80 dark:text-[#b2e0d4]/90">Total
                         Maintaining Balance</h2>
                     <button type="button" id="editBalanceBtn" onclick="openBalanceModal()"
                         title="Set Maintaining Balance"
-                        class="text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition">
+                        class="text-[#66b3a1] hover:text-[#007a33] dark:hover:text-[#b2e0d4] transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
@@ -21,20 +21,20 @@
                     </button>
                 </div>
                 <span id="balanceStatusBadge"
-                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300">
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#e0f7f1] text-[#004d00] dark:bg-[#004d00]/70 dark:text-[#b2e0d4] border border-[#b2e0d4] dark:border-[#163829]">
                     Active Balance
                 </span>
             </div>
 
             <!-- Pipe literal: safely embeds ₱ + variable without crashing Thymeleaf parser -->
             <p id="totalBalanceDisplay" th:text="|₱ ${totalBalance}|"
-                class="my-2 text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+                class="my-2 text-4xl sm:text-5xl font-black tracking-tight text-[#004d00] dark:text-white">
                 ₱ 0.00
             </p>
 
             <div class="flex flex-wrap items-center gap-2 mt-1">
                 <button type="button" onclick="openBalanceModal()"
-                    class="text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:underline flex items-center">
+                    class="text-sm font-semibold text-[#007a33] dark:text-[#66b3a1] hover:text-[#004d00] dark:hover:text-[#b2e0d4] hover:underline flex items-center transition">
                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
@@ -48,7 +48,7 @@
                     +₱ 0.00 in / -₱ 0.00 out
                 </span>
             </div>
-            <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
                 Protected against negative balance. Expenses exceeding this amount will be rejected.
             </p>
         </div>
@@ -60,11 +60,11 @@
                     <div class="flex items-center space-x-2">
                         <!-- budgetMonthYear contains no ₱, safe without pipe literal -->
                         <h1 id="budgetMonthHeading" th:text="${budgetMonthYear}"
-                            class="text-xl sm:text-2xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white">
+                            class="text-xl sm:text-2xl font-black leading-tight tracking-tight text-[#004d00] dark:text-white">
                             Monthly Budget
                         </h1>
                         <button type="button" id="editBudgetBtn" onclick="openBudgetModal()" title="Edit Budget"
-                            class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition">
+                            class="text-[#66b3a1] hover:text-[#007a33] dark:hover:text-[#b2e0d4] transition">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
@@ -78,7 +78,7 @@
                 <!-- budgetPercent is an int, safe without pipe literal for simple concatenation -->
                 <button type="button" id="budgetPercentageDisplay" onclick="openBudgetModal()"
                     th:text="|${budgetPercent}% used|"
-                    class="text-sm font-bold text-blue-600 dark:text-blue-400 px-2.5 py-1 rounded bg-blue-50 dark:bg-blue-950/50 border border-blue-100 dark:border-blue-900 cursor-pointer hover:bg-blue-100 transition">
+                    class="text-sm font-bold text-[#007a33] dark:text-[#b2e0d4] px-2.5 py-1 rounded-lg bg-[#e0f7f1] dark:bg-[#004d00]/50 border border-[#b2e0d4] dark:border-[#007a33]/60 cursor-pointer hover:bg-[#b2e0d4]/30 transition">
                     0% used
                 </button>
             </div>
@@ -95,18 +95,18 @@
                           data-year=${budgetYear},
                           data-limit=${budgetLimitRaw},
                           data-has-budget=${budget != null}"
-                class="w-full bg-gray-200 rounded-full h-4 mb-4 dark:bg-gray-700 overflow-hidden shadow-inner relative cursor-pointer"
+                class="w-full bg-[#e0f7f1]/60 rounded-full h-4 mb-4 dark:bg-[#071811] overflow-hidden shadow-inner relative cursor-pointer border border-[#b2e0d4]/60 dark:border-[#163829]"
                 onclick="openBudgetModal()" title="Click to view or edit budget">
 
                 <!-- Width set server-side. JS adjusts color class on init via applyBudgetBarColor() -->
                 <div id="budgetProgressBar" th:style="|width: ${budgetPercent > 100 ? 100 : budgetPercent}%|"
                     th:attr="data-percent=${budgetPercent}"
-                    class="bg-blue-600 h-4 rounded-full transition-all duration-500 ease-out flex items-center justify-end pr-2">
+                    class="bg-[#007a33] h-4 rounded-full transition-all duration-500 ease-out flex items-center justify-end pr-2">
                 </div>
 
                 <!-- Empty state shown when no budget set -->
                 <div id="budgetEmptyBar" th:if="${budget == null}"
-                    class="absolute inset-0 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-full flex items-center justify-center text-xs font-semibold text-gray-500 dark:text-gray-400 hover:border-blue-400 transition">
+                    class="absolute inset-0 border-2 border-dashed border-[#b2e0d4] dark:border-[#163829] rounded-full flex items-center justify-center text-xs font-semibold text-gray-500 dark:text-gray-400 hover:border-[#66b3a1] transition">
                     Click to set budget limit
                 </div>
             </div>
@@ -115,7 +115,7 @@
             <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-5">
                 <span id="budgetRemainingText">
                     Remaining:
-                    <strong th:text="|₱ ${budgetRemaining}|" class="text-emerald-600 dark:text-emerald-400 font-bold">₱
+                    <strong th:text="|₱ ${budgetRemaining}|" class="text-[#007a33] dark:text-[#66b3a1] font-bold">₱
                         0.00</strong>
                 </span>
                 <span id="budgetLimitBadge">
@@ -128,7 +128,7 @@
             <!-- Action buttons -->
             <div class="flex flex-wrap items-center gap-3">
                 <button type="button" id="headerAddTransactionBtn" onclick="openCreateModal()"
-                    class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-5 py-2.5 text-center text-sm font-semibold text-white hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 transition shadow-sm">
+                    class="inline-flex items-center justify-center rounded-xl bg-[#007a33] hover:bg-[#00662a] px-5 py-2.5 text-center text-sm font-bold text-white focus:ring-4 focus:ring-[#66b3a1]/40 dark:focus:ring-[#007a33]/60 transition shadow-md shadow-[#007a33]/25">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -136,8 +136,8 @@
                     Add Transaction
                 </button>
                 <button type="button" id="headerSetBudgetBtn" onclick="openBudgetModal()"
-                    class="inline-flex items-center justify-center rounded-lg bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 transition shadow-sm">
-                    <svg class="w-4 h-4 mr-1.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="inline-flex items-center justify-center rounded-xl bg-white dark:bg-[#0d241a] border border-[#b2e0d4] dark:border-[#163829] px-4 py-2.5 text-sm font-bold text-[#004d00] dark:text-[#b2e0d4] hover:bg-[#e0f7f1] dark:hover:bg-[#133325] focus:ring-4 focus:ring-[#b2e0d4]/40 transition shadow-sm">
+                    <svg class="w-4 h-4 mr-1.5 text-[#007a33] dark:text-[#66b3a1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
                         </path>

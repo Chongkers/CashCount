@@ -93,10 +93,10 @@ function renderPaginationControls(totalPages, totalCount) {
         return;
     }
 
-    const btnBase = 'flex items-center justify-center text-sm py-2 px-3 leading-tight border';
-    const btnActive = `${btnBase} text-blue-600 bg-blue-50 border-blue-300 font-bold dark:border-gray-700 dark:bg-gray-700 dark:text-white`;
-    const btnInactive = `${btnBase} text-gray-500 bg-white border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white`;
-    const btnArrow = 'flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white disabled:opacity-40 disabled:cursor-not-allowed';
+    const btnBase = 'flex items-center justify-center text-sm py-2 px-3 leading-tight border transition-colors';
+    const btnActive = `${btnBase} text-[#004d00] bg-[#e0f7f1] border-[#66b3a1] font-bold dark:border-[#007a33] dark:bg-[#004d00] dark:text-[#e0f7f1] shadow-sm`;
+    const btnInactive = `${btnBase} text-gray-600 bg-white border-gray-200 hover:bg-[#e0f7f1]/50 hover:text-[#004d00] dark:bg-[#0d241a] dark:border-[#163829] dark:text-gray-300 dark:hover:bg-[#133325] dark:hover:text-white`;
+    const btnArrow = 'flex items-center justify-center h-full py-1.5 px-3 text-gray-500 bg-white border border-gray-200 hover:bg-[#e0f7f1]/50 hover:text-[#004d00] dark:bg-[#0d241a] dark:border-[#163829] dark:text-gray-400 dark:hover:bg-[#133325] dark:hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors';
 
     let html = `<li>
         <button type="button" ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})"
@@ -175,7 +175,7 @@ function renderCategoryFilterOptions() {
         <li class="flex items-center">
             <input id="cat-filter-${idx}" type="checkbox" value="${escapeHtml(cat)}"
                    onchange="toggleCategoryFilter('${escapeHtml(cat)}', this.checked)"
-                   class="w-4 h-4 bg-gray-100 border-gray-300 rounded text-blue-600 focus:ring-blue-500 dark:bg-gray-600 dark:border-gray-500">
+                   class="w-4 h-4 bg-gray-50 border-gray-300 rounded text-[#007a33] focus:ring-[#007a33] dark:bg-[#091b13] dark:border-[#163829] dark:focus:ring-[#66b3a1]">
             <label for="cat-filter-${idx}"
                    class="ml-2 text-xs font-medium text-gray-700 dark:text-gray-200 cursor-pointer select-none">
                 ${escapeHtml(cat)}

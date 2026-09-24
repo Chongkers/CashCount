@@ -7,6 +7,7 @@ import com.example.demo.repository.BudgetRepository;
 import com.example.demo.repository.TransactionRepository;
 import com.example.demo.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -17,6 +18,7 @@ public class DataInitializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
     private final BudgetRepository budgetRepository;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public DataInitializer(UserRepository userRepository, 
                            TransactionRepository transactionRepository, 
@@ -34,7 +36,8 @@ public class DataInitializer implements CommandLineRunner {
         if (user == null) {
             user = new User();
             user.setUsername(demoEmail);
-            user.setPassword("password123");
+            user.setPassword(passwordEncoder.encode("password123"));
+            user.setSetupComplete(true); // Demo account skips setup wizard
             user = userRepository.save(user);
 
             // Seed initial transactions

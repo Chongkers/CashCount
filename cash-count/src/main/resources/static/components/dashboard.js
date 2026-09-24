@@ -57,8 +57,53 @@ function resetPrototype() {
     clearAllData();
 }
 
+// ── Theme Management (Dark / Light Mode) ──────────────────────────────────────
+function syncThemeIcons() {
+    const isDark = document.documentElement.classList.contains('dark');
+    const darkIcons = document.querySelectorAll('.theme-toggle-dark-icon');
+    const lightIcons = document.querySelectorAll('.theme-toggle-light-icon');
+
+    darkIcons.forEach(icon => {
+        if (isDark) {
+            icon.classList.remove('hidden');
+        } else {
+            icon.classList.add('hidden');
+        }
+    });
+
+    lightIcons.forEach(icon => {
+        if (isDark) {
+            icon.classList.add('hidden');
+        } else {
+            icon.classList.remove('hidden');
+        }
+    });
+}
+
+function toggleTheme() {
+    const isDark = document.documentElement.classList.contains('dark');
+    if (isDark) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('color-theme', 'light');
+    } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('color-theme', 'dark');
+    }
+    syncThemeIcons();
+}
+
+function initTheme() {
+    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
+    syncThemeIcons();
+}
+
 // ── Initialization ────────────────────────────────────────────────────────────
 function initDashboard() {
+    initTheme();
     if (typeof initTableInteractivity === 'function') initTableInteractivity();
     if (typeof applyBudgetBarColor === 'function') applyBudgetBarColor();
 }

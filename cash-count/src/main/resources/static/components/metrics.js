@@ -19,26 +19,20 @@ function applyBudgetBarColor() {
     } else if (percent >= 80) {
         bar.className = `bg-amber-500 ${base}`;
     } else if (percent >= 50) {
-        bar.className = `bg-blue-600 ${base}`;
+        bar.className = `bg-[#007a33] ${base}`;
     } else {
-        bar.className = `bg-emerald-500 ${base}`;
+        bar.className = `bg-[#2d9175] ${base}`;
     }
-
-
 
     // Update % badge color to match bar state
     const badge = document.getElementById('budgetPercentageDisplay');
     if (badge) {
         if (percent > 100) {
-            badge.className = badge.className
-                .replace(/text-\w+-\d+/g, 'text-red-600')
-                .replace(/bg-\w+-\d+/g, 'bg-red-50')
-                .replace(/border-\w+-\d+/g, 'border-red-100');
+            badge.className = 'text-sm font-bold text-red-600 dark:text-red-400 px-2.5 py-1 rounded bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-900 cursor-pointer hover:bg-red-100 transition';
         } else if (percent >= 80) {
-            badge.className = badge.className
-                .replace(/text-\w+-\d+/g, 'text-amber-600')
-                .replace(/bg-\w+-\d+/g, 'bg-amber-50')
-                .replace(/border-\w+-\d+/g, 'border-amber-100');
+            badge.className = 'text-sm font-bold text-amber-600 dark:text-amber-400 px-2.5 py-1 rounded bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-900 cursor-pointer hover:bg-amber-100 transition';
+        } else {
+            badge.className = 'text-sm font-bold text-[#007a33] dark:text-[#b2e0d4] px-2.5 py-1 rounded bg-[#e0f7f1] dark:bg-[#004d00]/50 border border-[#b2e0d4] dark:border-[#007a33]/60 cursor-pointer hover:bg-[#b2e0d4]/30 transition';
         }
     }
 }
