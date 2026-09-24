@@ -10,8 +10,12 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @Column(unique = true)
     private String username;
     private String password;
+
+    @Column(nullable = false)
+    private boolean setupComplete = false;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Transaction> transactions;
@@ -28,6 +32,9 @@ public class User {
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+
+    public boolean isSetupComplete() { return setupComplete; }
+    public void setSetupComplete(boolean setupComplete) { this.setupComplete = setupComplete; }
 
     public List<Transaction> getTransactions() { return transactions; }
     public void setTransactions(List<Transaction> transactions) { this.transactions = transactions; }

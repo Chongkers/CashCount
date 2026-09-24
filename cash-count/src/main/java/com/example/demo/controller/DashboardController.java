@@ -6,6 +6,7 @@ import com.example.demo.model.User;
 import com.example.demo.repository.BudgetRepository;
 import com.example.demo.repository.TransactionRepository;
 import com.example.demo.repository.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -46,21 +47,20 @@ public class DashboardController {
         CATEGORY_CLASSES.put("Other",          "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600");
     }
 
-    private User getOrCreateDemoUser() {
-        String username = "demo@cashcount.com";
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            user = new User();
-            user.setUsername(username);
-            user.setPassword("password123");
-            user = userRepository.save(user);
-        }
-        return user;
+    /**
+     * Gets the logged-in user from session, or returns null if not authenticated.
+     */
+    private User getLoggedInUser(HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) return null;
+        return userRepository.findById(userId).orElse(null);
     }
 
     @GetMapping("/dashboard")
-    public String showDashboard(Model model) {
-        User user = getOrCreateDemoUser();
+    public String showDashboard(HttpSession session, Model model) {
+        User user = getLoggedInUser(session);
+        if (user == null) return "redirect:/login";
+
         List<Transaction> transactions = transactionRepository.findByUserOrderByDateDesc(user);
 
         // ── Compute totals ────────────────────────────────────────────────────
@@ -87,6 +87,9 @@ public class DashboardController {
             if (parts.length > 1) budgetYear = parts[1];
         }
 
+        // ── Setup wizard flag ─────────────────────────────────────────────────
+        model.addAttribute("showSetupWizard", !user.isSetupComplete());
+
         // ── Model attributes ──────────────────────────────────────────────────
         // Transactions: passed directly — Thymeleaf renders rows, no JSON serialization
         model.addAttribute("transactions",    transactions);
@@ -107,7 +110,48 @@ public class DashboardController {
         model.addAttribute("budgetMonthYear", budget != null ? budget.getMonthYear() : "Monthly Budget");
         model.addAttribute("budget",         budget);
 
+        // User info for navbar
+        model.addAttribute("userEmail", user.getUsername());
+
         return "dashboard";
+    }
+
+    // ── First-Time Setup ──────────────────────────────────────────────────────
+    @PostMapping("/setup/complete")
+    public String completeSetup(@RequestParam Double balance,
+                                @RequestParam String month,
+                                @RequestParam Integer year,
+                                @RequestParam Double budgetLimit,
+                                HttpSession session,
+                                RedirectAttributes ra) {
+        User user = getLoggedInUser(session);
+        if (user == null) return "redirect:/login";
+
+        // Create initial income transaction for the maintaining balance
+        Transaction initialDeposit = new Transaction();
+        initialDeposit.setUser(user);
+        initialDeposit.setTitle("Initial Maintaining Balance");
+        initialDeposit.setType("INCOME");
+        initialDeposit.setCategory("Salary");
+        initialDeposit.setAmount(balance);
+        initialDeposit.setDate(LocalDate.now());
+        initialDeposit.setNotes("Starting balance set during account setup");
+        transactionRepository.save(initialDeposit);
+
+        // Create budget
+        String monthYear = month + " " + year;
+        Budget budget = new Budget();
+        budget.setUser(user);
+        budget.setMonthYear(monthYear);
+        budget.setTargetAmount(budgetLimit);
+        budgetRepository.save(budget);
+
+        // Mark setup as complete
+        user.setSetupComplete(true);
+        userRepository.save(user);
+
+        ra.addFlashAttribute("successMessage", "Welcome to CashCount! Your account is all set up.");
+        return "redirect:/dashboard";
     }
 
     // ── Add Transaction ───────────────────────────────────────────────────────
@@ -119,9 +163,12 @@ public class DashboardController {
                                  @RequestParam Double amount,
                                  @RequestParam String date,
                                  @RequestParam(required = false) String notes,
+                                 HttpSession session,
                                  RedirectAttributes ra) {
+        User user = getLoggedInUser(session);
+        if (user == null) return "redirect:/login";
+
         String txType = createType != null ? createType : (type != null ? type : "EXPENSE");
-        User user = getOrCreateDemoUser();
 
         // Server-side negative balance guard
         List<Transaction> existing = transactionRepository.findByUser(user);
@@ -162,9 +209,13 @@ public class DashboardController {
                                     @RequestParam Double amount,
                                     @RequestParam String date,
                                     @RequestParam(required = false) String notes,
+                                    HttpSession session,
                                     RedirectAttributes ra) {
+        User user = getLoggedInUser(session);
+        if (user == null) return "redirect:/login";
+
         Transaction tx = transactionRepository.findById(id).orElse(null);
-        if (tx != null) {
+        if (tx != null && tx.getUser().getId().equals(user.getId())) {
             tx.setTitle(title);
             tx.setType(type);
             tx.setCategory(category);
@@ -181,11 +232,18 @@ public class DashboardController {
     @PostMapping({"/transactions/delete/{id}", "/transactions/delete"})
     public String deleteTransaction(@PathVariable(required = false) Long id,
                                     @RequestParam(value = "id", required = false) Long paramId,
+                                    HttpSession session,
                                     RedirectAttributes ra) {
+        User user = getLoggedInUser(session);
+        if (user == null) return "redirect:/login";
+
         Long targetId = id != null ? id : paramId;
         if (targetId != null) {
-            transactionRepository.deleteById(targetId);
-            ra.addFlashAttribute("successMessage", "Transaction deleted successfully!");
+            Transaction tx = transactionRepository.findById(targetId).orElse(null);
+            if (tx != null && tx.getUser().getId().equals(user.getId())) {
+                transactionRepository.deleteById(targetId);
+                ra.addFlashAttribute("successMessage", "Transaction deleted successfully!");
+            }
         }
         return "redirect:/dashboard";
     }
@@ -195,8 +253,11 @@ public class DashboardController {
     public String setBudget(@RequestParam String month,
                             @RequestParam Integer year,
                             @RequestParam Double limit,
+                            HttpSession session,
                             RedirectAttributes ra) {
-        User user = getOrCreateDemoUser();
+        User user = getLoggedInUser(session);
+        if (user == null) return "redirect:/login";
+
         String monthYear = month + " " + year;
         Budget budget = budgetRepository.findByUserAndMonthYear(user, monthYear).orElse(new Budget());
         budget.setUser(user);
@@ -211,7 +272,11 @@ public class DashboardController {
     @PostMapping("/balance/set")
     public String setMaintainingBalance(@RequestParam(required = false) Double balance,
                                         @RequestParam(required = false) Double baseBalance,
+                                        HttpSession session,
                                         RedirectAttributes ra) {
+        User user = getLoggedInUser(session);
+        if (user == null) return "redirect:/login";
+
         ra.addFlashAttribute("successMessage", "Maintaining balance reference updated!");
         return "redirect:/dashboard";
     }
@@ -219,10 +284,17 @@ public class DashboardController {
     // ── Clear All Data (prototype reset) ──────────────────────────────────────
     @Transactional
     @PostMapping("/data/clear")
-    public String clearAllData(RedirectAttributes ra) {
-        User user = getOrCreateDemoUser();
+    public String clearAllData(HttpSession session, RedirectAttributes ra) {
+        User user = getLoggedInUser(session);
+        if (user == null) return "redirect:/login";
+
         transactionRepository.deleteAllByUser(user);
         budgetRepository.deleteAllByUser(user);
+
+        // Reset setup state so wizard shows again
+        user.setSetupComplete(false);
+        userRepository.save(user);
+
         ra.addFlashAttribute("successMessage", "All data cleared. Start fresh!");
         return "redirect:/dashboard";
     }
