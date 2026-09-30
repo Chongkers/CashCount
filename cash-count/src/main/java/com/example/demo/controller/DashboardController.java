@@ -91,7 +91,6 @@ public class DashboardController {
         model.addAttribute("showSetupWizard", !user.isSetupComplete());
 
         // ── Model attributes ──────────────────────────────────────────────────
-        // Transactions: passed directly — Thymeleaf renders rows, no JSON serialization
         model.addAttribute("transactions",    transactions);
         model.addAttribute("categoryClasses", CATEGORY_CLASSES);
 
@@ -102,13 +101,26 @@ public class DashboardController {
         model.addAttribute("budgetLimit",     String.format("%,.2f", budgetLimit));
         model.addAttribute("budgetRemaining", String.format("%,.2f", budgetRemaining));
 
-        // Raw values for data-* attributes (used by JS budget modal pre-fill)
-        model.addAttribute("budgetLimitRaw", budgetLimit);
-        model.addAttribute("budgetPercent",  budgetPercent);
-        model.addAttribute("budgetMonth",    budgetMonth);
-        model.addAttribute("budgetYear",     budgetYear);
+        // Raw numeric values for JS notification logic and data-* attributes
+        model.addAttribute("totalBalanceRaw", totalBalance);
+        model.addAttribute("budgetLimitRaw",  budgetLimit);
+        model.addAttribute("budgetPercent",   budgetPercent);
+        model.addAttribute("budgetMonth",     budgetMonth);
+        model.addAttribute("budgetYear",      budgetYear);
         model.addAttribute("budgetMonthYear", budget != null ? budget.getMonthYear() : "Monthly Budget");
-        model.addAttribute("budget",         budget);
+        model.addAttribute("budget",          budget);
+
+        // ── Notification flags ─────────────────────────────────────────────────
+        // showTxSuccess is set as a flash attribute by POST handlers
+        Boolean showTxSuccess = (Boolean) model.asMap().getOrDefault("showTxSuccess", Boolean.FALSE);
+        boolean lowBalance    = totalBalance < 1000.0 && Boolean.TRUE.equals(showTxSuccess);
+        boolean overBudget    = budgetLimit > 0 && totalExpense > budgetLimit && Boolean.TRUE.equals(showTxSuccess);
+        model.addAttribute("showTxSuccess",  showTxSuccess);
+        model.addAttribute("showLowBalance", lowBalance);
+        model.addAttribute("showOverBudget", overBudget);
+        // Defaults for notification fields not set via flash (dashboard direct visit)
+        if (!model.containsAttribute("lastTxType"))   model.addAttribute("lastTxType",   null);
+        if (!model.containsAttribute("lastTxAmount")) model.addAttribute("lastTxAmount", null);
 
         // User info for navbar
         model.addAttribute("userEmail", user.getUsername());
@@ -196,7 +208,10 @@ public class DashboardController {
         try { tx.setDate(LocalDate.parse(date)); } catch (Exception e) { tx.setDate(LocalDate.now()); }
 
         transactionRepository.save(tx);
-        ra.addFlashAttribute("successMessage", "Transaction added successfully!");
+        ra.addFlashAttribute("successMessage", txType.equals("INCOME") ? "Income recorded successfully!" : "Expense recorded successfully!");
+        ra.addFlashAttribute("showTxSuccess",  Boolean.TRUE);
+        ra.addFlashAttribute("lastTxType",     txType);
+        ra.addFlashAttribute("lastTxAmount",   amount);
         return "redirect:/dashboard";
     }
 
@@ -224,6 +239,9 @@ public class DashboardController {
             try { tx.setDate(LocalDate.parse(date)); } catch (Exception e) { tx.setDate(LocalDate.now()); }
             transactionRepository.save(tx);
             ra.addFlashAttribute("successMessage", "Transaction updated successfully!");
+            ra.addFlashAttribute("showTxSuccess",  Boolean.TRUE);
+            ra.addFlashAttribute("lastTxType",     type);
+            ra.addFlashAttribute("lastTxAmount",   amount);
         }
         return "redirect:/dashboard";
     }
@@ -243,6 +261,7 @@ public class DashboardController {
             if (tx != null && tx.getUser().getId().equals(user.getId())) {
                 transactionRepository.deleteById(targetId);
                 ra.addFlashAttribute("successMessage", "Transaction deleted successfully!");
+                ra.addFlashAttribute("showTxSuccess",  Boolean.TRUE);
             }
         }
         return "redirect:/dashboard";
@@ -297,5 +316,49 @@ public class DashboardController {
 
         ra.addFlashAttribute("successMessage", "All data cleared. Start fresh!");
         return "redirect:/dashboard";
+    }
+
+    // ── Monthly Report Page ────────────────────────────────────────────────────
+    @GetMapping("/report")
+    public String showReport(HttpSession session, Model model,
+                             jakarta.servlet.http.HttpServletResponse response) {
+        // Always serve fresh data — never let the browser cache this page
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
+
+        User user = getLoggedInUser(session);
+        if (user == null) return "redirect:/login";
+
+        // Always fetch the latest list directly from DB (no caching)
+        List<Transaction> allTransactions = transactionRepository.findByUserOrderByDateDesc(user);
+
+        // Budget data (for label + limit display only)
+        Budget budget = budgetRepository.findTopByUserOrderByIdDesc(user).orElse(null);
+        String budgetMonthYear = budget != null ? budget.getMonthYear() : null;
+        double budgetLimit     = budget != null && budget.getTargetAmount() != null ? budget.getTargetAmount() : 0.0;
+
+        // Always use ALL transactions — no month filter so nothing gets missed
+        double totalIncome  = allTransactions.stream()
+                                .filter(t -> "INCOME".equalsIgnoreCase(t.getType()))
+                                .mapToDouble(t -> t.getAmount() != null ? t.getAmount() : 0).sum();
+        double totalExpense = allTransactions.stream()
+                                .filter(t -> !"INCOME".equalsIgnoreCase(t.getType()))
+                                .mapToDouble(t -> t.getAmount() != null ? t.getAmount() : 0).sum();
+        double netBalance   = totalIncome - totalExpense;
+        int    budgetPct    = budgetLimit > 0 ? (int) Math.round((totalExpense / budgetLimit) * 100) : 0;
+
+        model.addAttribute("reportTransactions",    allTransactions);
+        model.addAttribute("categoryClasses",       CATEGORY_CLASSES);
+        model.addAttribute("reportMonthYear",       budgetMonthYear != null ? budgetMonthYear : "All Transactions");
+        model.addAttribute("reportTotalIncome",     String.format("%,.2f", totalIncome));
+        model.addAttribute("reportTotalExpense",    String.format("%,.2f", totalExpense));
+        model.addAttribute("reportNetBalance",      String.format("%,.2f", netBalance));
+        model.addAttribute("reportBudgetLimit",     String.format("%,.2f", budgetLimit));
+        model.addAttribute("reportBudgetPct",       budgetPct);
+        model.addAttribute("reportGeneratedAt",     LocalDate.now().toString());
+        model.addAttribute("userEmail",             user.getUsername());
+
+        return "report";
     }
 }

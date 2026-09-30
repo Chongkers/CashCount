@@ -10,6 +10,8 @@ echo.
 :: Detect if we need to navigate to the project directory
 if exist "%~dp0CashCount\cash-count\gradlew.bat" (
     cd /d "%~dp0CashCount\cash-count"
+) else if exist "%~dp0cash-count\gradlew.bat" (
+    cd /d "%~dp0cash-count"
 ) else if exist "%~dp0gradlew.bat" (
     cd /d "%~dp0"
 )

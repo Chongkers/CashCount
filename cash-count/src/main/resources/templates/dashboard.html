@@ -46,21 +46,23 @@
     <!-- Navbar -->
     <div id="navbar-slot" th:replace="~{components/navbar :: navbar}"></div>
 
-    <!-- Flash Messages -->
-    <div class="mx-auto max-w-screen-xl px-4 sm:px-8 pt-4">
-        <div th:if="${successMessage}"
-             class="p-4 mb-4 text-sm text-[#004d00] rounded-xl bg-[#e0f7f1] dark:bg-[#004d00]/50 dark:text-[#b2e0d4] border border-[#b2e0d4] dark:border-[#007a33]/60 flex items-center justify-between shadow-sm"
-             role="alert">
-            <span class="font-medium" th:text="${successMessage}">Operation successful!</span>
-            <button type="button" onclick="this.parentElement.remove()" class="text-[#007a33] hover:text-[#004d00] dark:hover:text-white">&times;</button>
-        </div>
-        <div th:if="${errorMessage}"
-             class="p-4 mb-4 text-sm text-red-800 rounded-xl bg-red-50 dark:bg-red-950/60 dark:text-red-300 border border-red-200 dark:border-red-800 flex items-center justify-between shadow-sm"
-             role="alert">
-            <span class="font-medium" th:text="${errorMessage}">Error occurred!</span>
-            <button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-800 dark:hover:text-white">&times;</button>
-        </div>
-    </div>
+    <!-- Notification data passed from Thymeleaf to JS for modal display -->
+    <script th:inline="javascript">
+        window.__NOTIFICATIONS__ = {
+            successMessage:  /*[[${successMessage}]]*/  null,
+            errorMessage:    /*[[${errorMessage}]]*/    null,
+            totalBalance:    /*[[${totalBalanceRaw}]]*/ 0,
+            budgetPercent:   /*[[${budgetPercent}]]*/   0,
+            totalExpense:    /*[[${totalExpense}]]*/    '0.00',
+            budgetLimit:     /*[[${budgetLimit}]]*/     '0.00',
+            lastTxType:      /*[[${lastTxType}]]*/      null,
+            lastTxAmount:    /*[[${lastTxAmount}]]*/    null,
+            showLowBalance:  /*[[${showLowBalance}]]*/  false,
+            showOverBudget:  /*[[${showOverBudget}]]*/  false,
+            showTxSuccess:   /*[[${showTxSuccess}]]*/   false
+        };
+    </script>
+
 
     <!-- Hero: Balance & Budget (all values server-rendered by Thymeleaf) -->
     <div id="hero-slot" th:replace="~{components/hero :: hero}"></div>

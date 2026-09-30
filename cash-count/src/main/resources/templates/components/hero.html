@@ -144,6 +144,16 @@
                     </svg>
                     <span id="setBudgetBtnText">Set / Edit Budget</span>
                 </button>
+                <button type="button" id="generateReportBtn"
+                    onclick="window.open('/report?t=' + Date.now(), '_blank')"
+                    class="inline-flex items-center justify-center rounded-xl bg-white dark:bg-[#0d241a] border border-[#b2e0d4] dark:border-[#163829] px-4 py-2.5 text-sm font-bold text-[#004d00] dark:text-[#b2e0d4] hover:bg-[#e0f7f1] dark:hover:bg-[#133325] focus:ring-4 focus:ring-[#b2e0d4]/40 transition shadow-sm">
+                    <svg class="w-4 h-4 mr-1.5 text-[#007a33] dark:text-[#66b3a1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
+                    </svg>
+                    Monthly Report
+                </button>
             </div>
         </div>
     </div>

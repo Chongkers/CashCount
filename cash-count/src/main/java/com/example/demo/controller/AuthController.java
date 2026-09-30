@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.model.User;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.service.EmailService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,6 +18,9 @@ public class AuthController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -97,6 +101,9 @@ public class AuthController {
         newUser.setPassword(passwordEncoder.encode(password));
         newUser.setSetupComplete(false); // Will trigger setup wizard on first login
         userRepository.save(newUser);
+
+        // Send welcome email to the newly registered address
+        emailService.sendWelcome(normalizedEmail);
 
         ra.addFlashAttribute("successMessage", "Account created! Please sign in.");
         return "redirect:/login";

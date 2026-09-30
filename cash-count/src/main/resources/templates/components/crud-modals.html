@@ -438,6 +438,132 @@
         </div>
     </div>
 
+    <!-- ── NOTIFICATION: Transaction Success Modal ─────────────────────────── -->
+    <div id="successNotificationModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-full bg-gray-900/60 backdrop-blur-sm">
+        <div class="relative p-4 w-full max-w-sm max-h-full">
+            <div class="relative p-6 text-center bg-white rounded-2xl shadow-2xl dark:bg-[#0d241a] border border-[#b2e0d4]/80 dark:border-[#163829]">
+                <button type="button" onclick="closeModal('successNotificationModal')" class="text-gray-400 absolute top-3 right-3 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 inline-flex items-center dark:hover:bg-[#133325] dark:hover:text-white">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                </button>
+
+                <!-- Animated check icon -->
+                <div class="w-16 h-16 rounded-full bg-[#e0f7f1] dark:bg-[#004d00]/60 flex items-center justify-center mx-auto mb-4 border-4 border-[#b2e0d4] dark:border-[#007a33]/60">
+                    <svg class="w-8 h-8 text-[#007a33] dark:text-[#b2e0d4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+
+                <h3 id="successModalTitle" class="mb-1 text-xl font-black text-[#004d00] dark:text-white">Transaction Saved!</h3>
+                <p id="successModalMessage" class="text-sm text-gray-500 dark:text-gray-400 mb-5">Your transaction has been recorded successfully.</p>
+
+                <!-- Summary row -->
+                <div id="successModalSummary" class="hidden mb-5 p-3 bg-[#e0f7f1]/60 dark:bg-[#004d00]/30 rounded-xl border border-[#b2e0d4]/60 dark:border-[#163829] text-left text-sm space-y-1.5">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 dark:text-gray-400 font-medium">Type</span>
+                        <span id="successModalType" class="font-bold text-[#004d00] dark:text-[#b2e0d4]">—</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 dark:text-gray-400 font-medium">Amount</span>
+                        <span id="successModalAmount" class="font-black text-lg text-[#007a33] dark:text-[#66b3a1]">—</span>
+                    </div>
+                </div>
+
+                <button type="button" onclick="closeModal('successNotificationModal')"
+                    class="w-full py-2.5 px-5 text-sm font-bold text-white bg-[#007a33] hover:bg-[#00662a] rounded-xl focus:ring-4 focus:ring-[#66b3a1]/40 transition shadow-md shadow-[#007a33]/25">
+                    Got it!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── NOTIFICATION: Low Balance Warning Modal ─────────────────────────── -->
+    <div id="lowBalanceModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-full bg-gray-900/60 backdrop-blur-sm">
+        <div class="relative p-4 w-full max-w-sm max-h-full">
+            <div class="relative p-6 text-center bg-white rounded-2xl shadow-2xl dark:bg-[#0d241a] border border-amber-200/80 dark:border-amber-800/60">
+                <button type="button" onclick="closeModal('lowBalanceModal')" class="text-gray-400 absolute top-3 right-3 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 inline-flex items-center dark:hover:bg-[#133325] dark:hover:text-white">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                </button>
+
+                <!-- Warning icon -->
+                <div class="w-16 h-16 rounded-full bg-amber-50 dark:bg-amber-900/40 flex items-center justify-center mx-auto mb-4 border-4 border-amber-200 dark:border-amber-800">
+                    <svg class="w-8 h-8 text-amber-500 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+
+                <h3 class="mb-1 text-xl font-black text-amber-700 dark:text-amber-400">Low Balance Alert</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">Your maintaining balance has dropped below ₱1,000.</p>
+
+                <div class="mb-5 p-3 bg-amber-50 dark:bg-amber-900/30 rounded-xl border border-amber-200 dark:border-amber-800 text-sm">
+                    <div class="text-xs uppercase tracking-wider text-amber-600 dark:text-amber-400 font-semibold mb-1">Current Balance</div>
+                    <div id="lowBalanceAmount" class="text-2xl font-black text-amber-700 dark:text-amber-300">₱ 0.00</div>
+                </div>
+
+                <p class="text-xs text-gray-400 dark:text-gray-500 mb-4">Consider adding income transactions to maintain a healthy balance. Expenses exceeding your balance will be rejected.</p>
+
+                <div class="flex gap-2">
+                    <button type="button" onclick="closeModal('lowBalanceModal')"
+                        class="flex-1 py-2.5 px-4 text-sm font-semibold text-gray-700 bg-white rounded-xl border border-gray-300 hover:bg-gray-100 dark:bg-[#0d241a] dark:text-gray-300 dark:border-[#163829] dark:hover:bg-[#133325] transition">
+                        Dismiss
+                    </button>
+                    <button type="button" onclick="closeModal('lowBalanceModal'); openCreateModal();"
+                        class="flex-1 py-2.5 px-4 text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 rounded-xl transition shadow-md">
+                        Add Income
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── NOTIFICATION: Overbudget Alert Modal ────────────────────────────── -->
+    <div id="overbudgetModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-full bg-gray-900/60 backdrop-blur-sm">
+        <div class="relative p-4 w-full max-w-sm max-h-full">
+            <div class="relative p-6 text-center bg-white rounded-2xl shadow-2xl dark:bg-[#0d241a] border border-red-200/80 dark:border-red-800/60">
+                <button type="button" onclick="closeModal('overbudgetModal')" class="text-gray-400 absolute top-3 right-3 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 inline-flex items-center dark:hover:bg-[#133325] dark:hover:text-white">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                </button>
+
+                <!-- Alert icon -->
+                <div class="w-16 h-16 rounded-full bg-red-50 dark:bg-red-900/40 flex items-center justify-center mx-auto mb-4 border-4 border-red-200 dark:border-red-800">
+                    <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
+                    </svg>
+                </div>
+
+                <h3 class="mb-1 text-xl font-black text-red-700 dark:text-red-400">Budget Exceeded!</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">Your total expenses have exceeded your monthly budget limit.</p>
+
+                <div class="mb-5 p-3 bg-red-50 dark:bg-red-900/30 rounded-xl border border-red-200 dark:border-red-800 text-sm space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 dark:text-gray-400 text-xs font-medium">Budget Used</span>
+                        <span id="overbudgetPercent" class="font-black text-red-600 dark:text-red-400">0%</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 dark:text-gray-400 text-xs font-medium">Total Expenses</span>
+                        <span id="overbudgetExpense" class="font-bold text-red-600 dark:text-red-400">₱ 0.00</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 dark:text-gray-400 text-xs font-medium">Budget Limit</span>
+                        <span id="overbudgetLimit" class="font-bold text-gray-700 dark:text-gray-300">₱ 0.00</span>
+                    </div>
+                </div>
+
+                <p class="text-xs text-gray-400 dark:text-gray-500 mb-4">Consider reviewing your spending or adjusting your monthly budget limit.</p>
+
+                <div class="flex gap-2">
+                    <button type="button" onclick="closeModal('overbudgetModal')"
+                        class="flex-1 py-2.5 px-4 text-sm font-semibold text-gray-700 bg-white rounded-xl border border-gray-300 hover:bg-gray-100 dark:bg-[#0d241a] dark:text-gray-300 dark:border-[#163829] dark:hover:bg-[#133325] transition">
+                        Dismiss
+                    </button>
+                    <button type="button" onclick="closeModal('overbudgetModal'); openBudgetModal();"
+                        class="flex-1 py-2.5 px-4 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl transition shadow-md">
+                        Adjust Budget
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Notification Toast -->
     <div id="toastNotification" class="fixed bottom-5 right-5 z-50 flex items-center w-full max-w-xs p-4 space-x-3 text-gray-600 bg-white rounded-xl shadow-2xl dark:text-gray-300 dark:bg-[#0d241a] border border-[#b2e0d4]/80 dark:border-[#163829] transition-all duration-300 transform translate-y-16 opacity-0 pointer-events-none" role="alert">
         <div id="toastIconContainer" class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 rounded-xl bg-[#e0f7f1] text-[#007a33] dark:bg-[#004d00]/70 dark:text-[#b2e0d4]">

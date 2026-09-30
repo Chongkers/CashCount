@@ -33,7 +33,8 @@ function closeModal(modalId) {
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
         ['setMaintainingBalanceModal','setBudgetModal','createTransactionModal',
-         'updateTransactionModal','readTransactionModal','deleteTransactionModal']
+         'updateTransactionModal','readTransactionModal','deleteTransactionModal',
+         'successNotificationModal','lowBalanceModal','overbudgetModal']
             .forEach(closeModal);
     }
 });
@@ -278,3 +279,86 @@ function confirmDelete(e) {
     // Form submits naturally to /transactions/delete/{id} (POST)
     // Nothing to prevent — just allow the form submission
 }
+
+// ── Notification Modal Auto-Show (triggered from Thymeleaf flash data) ─────────
+
+function initNotificationModals() {
+    const n = window.__NOTIFICATIONS__;
+    if (!n) return;
+
+    // Queue: show modals in sequence (success → low balance → overbudget)
+    // We only show ONE modal at a time with staggered priority.
+    if (n.showTxSuccess && n.successMessage) {
+        // Populate success modal
+        const title  = document.getElementById('successModalTitle');
+        const msg    = document.getElementById('successModalMessage');
+        const summary = document.getElementById('successModalSummary');
+        const typeEl = document.getElementById('successModalType');
+        const amtEl  = document.getElementById('successModalAmount');
+
+        if (title) title.textContent = n.successMessage;
+        if (msg) msg.textContent = '';
+
+        if (n.lastTxType && n.lastTxAmount != null) {
+            const isIncome = n.lastTxType === 'INCOME';
+            if (typeEl) {
+                typeEl.textContent = isIncome ? 'Income (Cash In)' : 'Expense (Cash Out)';
+                typeEl.className = isIncome
+                    ? 'font-bold text-emerald-600 dark:text-emerald-400'
+                    : 'font-bold text-red-600 dark:text-red-400';
+            }
+            if (amtEl) {
+                amtEl.textContent = (isIncome ? '+ ' : '- ') + formatCurrency(n.lastTxAmount);
+                amtEl.className = isIncome
+                    ? 'font-black text-lg text-emerald-600 dark:text-emerald-400'
+                    : 'font-black text-lg text-red-600 dark:text-red-400';
+            }
+            if (summary) summary.classList.remove('hidden');
+        } else {
+            if (summary) summary.classList.add('hidden');
+        }
+
+        openModal('successNotificationModal');
+
+        // After success modal is dismissed, check if we need to show warning modals
+        const successCloseBtn = document.querySelector('#successNotificationModal button[onclick*="closeModal"]');
+        const okBtn = document.querySelector('#successNotificationModal button.w-full');
+        const showSubsequent = () => {
+            if (n.showLowBalance) {
+                showLowBalanceModal(n.totalBalance);
+            } else if (n.showOverBudget) {
+                showOverbudgetModal(n.budgetPercent, n.totalExpense, n.budgetLimit);
+            }
+        };
+        if (successCloseBtn) successCloseBtn.addEventListener('click', showSubsequent, { once: true });
+        if (okBtn) okBtn.addEventListener('click', showSubsequent, { once: true });
+
+    } else if (n.showLowBalance) {
+        showLowBalanceModal(n.totalBalance);
+
+    } else if (n.showOverBudget) {
+        showOverbudgetModal(n.budgetPercent, n.totalExpense, n.budgetLimit);
+
+    } else if (n.errorMessage) {
+        // Error: show a brief toast (no dedicated error modal needed)
+        if (typeof showToast === 'function') showToast(n.errorMessage, 'red');
+    }
+}
+
+function showLowBalanceModal(balance) {
+    const amtEl = document.getElementById('lowBalanceAmount');
+    if (amtEl) amtEl.textContent = formatCurrency(Number(balance) || 0);
+    openModal('lowBalanceModal');
+}
+
+function showOverbudgetModal(percent, expense, limit) {
+    const pctEl  = document.getElementById('overbudgetPercent');
+    const expEl  = document.getElementById('overbudgetExpense');
+    const limEl  = document.getElementById('overbudgetLimit');
+    if (pctEl)  pctEl.textContent  = percent + '%';
+    if (expEl)  expEl.textContent  = '₱ ' + expense;
+    if (limEl)  limEl.textContent  = '₱ ' + limit;
+    openModal('overbudgetModal');
+}
+
+document.addEventListener('DOMContentLoaded', initNotificationModals);
